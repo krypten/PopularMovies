@@ -1,0 +1,23 @@
+<resources>
+    <dimen name="zero_dimension">0dp</dimen>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <!-- Grid View -->
+    <dimen name="gridview_column_width">105dp</dimen>
+    <!-- Movie Detail Activity -->
+    <!-- Padding and width specifics -->
+    <dimen name="detail_movie_default_top_bottom_padding">50dp</dimen>
+    <dimen name="detail_movie_default_left_right_padding">30dp</dimen>
+    <dimen name="detail_movie_overview_left_right_padding">10dp</dimen>
+    <dimen name="detail_movie_poster_top_bottom_padding">10dp</dimen>
+    <dimen name="detail_movie_favorite_btn_width">65dp</dimen>
+    <dimen name="detail_movie_favorite_btn_height">30dp</dimen>
+    <dimen name="detail_movie_favorite_btn_padding">5dp</dimen>
+    <dimen name="detail_movie_favorite_btn_top_margin">10dp</dimen>
+    <!-- Text sizes -->
+    <dimen name="detail_movie_title_size">32sp</dimen>
+    <dimen name="detail_movie_release_date_size">24sp</dimen>
+    <dimen name="detail_movie_rating_size">10sp</dimen>
+    <dimen name="detail_movie_favorite_btn_size">8sp</dimen>
+</resources>
