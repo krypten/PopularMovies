@@ -2,7 +2,7 @@ package com.cyril.udacity.moviepop;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,7 +13,7 @@ import com.squareup.picasso.Picasso;
 /**
  * Movie Detail Activity for showing the details for Movie.
  */
-public class MovieDetailActivity extends ActionBarActivity {
+public class MovieDetailActivity extends AppCompatActivity {
     private Movie mMovie;
 
     @Override

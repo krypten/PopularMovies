@@ -7,7 +7,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"
+        android:layout_gravity="start"
         android:gravity="center_vertical"
         android:orientation="vertical">
 
@@ -18,7 +18,9 @@
             android:background="@color/teal"
             android:fontFamily="serif-monospace"
             android:paddingBottom="@dimen/detail_movie_default_top_bottom_padding"
+            android:paddingEnd="@dimen/detail_movie_default_left_right_padding"
             android:paddingLeft="@dimen/detail_movie_default_left_right_padding"
+            android:paddingRight="@dimen/detail_movie_default_left_right_padding"
             android:paddingStart="@dimen/detail_movie_default_left_right_padding"
             android:paddingTop="@dimen/detail_movie_default_top_bottom_padding"
             android:textColor="@android:color/white"
@@ -26,63 +28,54 @@
 
         <!-- Movie poster -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/detail_movie_poster_top_bottom_padding"
-            android:layout_marginTop="@dimen/detail_movie_poster_top_bottom_padding"
-            android:orientation="vertical">
+            android:layout_marginTop="@dimen/detail_movie_poster_top_bottom_padding">
 
+            <ImageView
+                android:id="@+id/movie_poster"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:gravity="start"
+                android:paddingEnd="@dimen/detail_movie_default_left_right_padding"
+                android:paddingLeft="@dimen/detail_movie_default_left_right_padding"
+                android:paddingRight="@dimen/detail_movie_default_left_right_padding"
+                android:paddingStart="@dimen/detail_movie_default_left_right_padding" />
+
+            <!-- Movie Info -->
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="@dimen/detail_movie_poster_top_bottom_padding">
 
-                <ImageView
-                    android:id="@+id/movie_poster"
+                <TextView
+                    android:id="@+id/movie_release_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="left"
-                    android:gravity="left"
-                    android:paddingEnd="@dimen/detail_movie_default_left_right_padding"
-                    android:paddingLeft="@dimen/detail_movie_default_left_right_padding"
-                    android:paddingRight="@dimen/detail_movie_default_left_right_padding"
-                    android:paddingStart="@dimen/detail_movie_default_left_right_padding" />
+                    android:fontFamily="serif-monospace"
+                    android:textSize="@dimen/detail_movie_release_date_size" />
 
-                <!-- Movie Info -->
-                <LinearLayout
+                <TextView
+                    android:id="@+id/movie_rating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingTop="@dimen/detail_movie_poster_top_bottom_padding">
+                    android:textSize="@dimen/detail_movie_rating_size"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/movie_release_date"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_toRightOf="@+id/movie_poster"
-                        android:fontFamily="serif-monospace"
-                        android:textSize="@dimen/detail_movie_release_date_size" />
-
-                    <TextView
-                        android:id="@+id/movie_rating"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_toRightOf="@+id/movie_poster"
-                        android:textSize="@dimen/detail_movie_rating_size"
-                        android:textStyle="bold" />
-
-                    <Button
-                        android:id="@+id/movie_mark_favorite_btn"
-                        android:layout_width="@dimen/detail_movie_favorite_btn_width"
-                        android:layout_height="@dimen/detail_movie_favorite_btn_height"
-                        android:layout_marginTop="@dimen/detail_movie_favorite_btn_top_margin"
-                        android:layout_toRightOf="@+id/movie_poster"
-                        android:background="@color/teal"
-                        android:paddingBottom="@dimen/detail_movie_favorite_btn_padding"
-                        android:paddingTop="@dimen/detail_movie_favorite_btn_padding"
-                        android:text="@string/movie_mark_favorite_label"
-                        android:textAllCaps="true"
-                        android:textSize="@dimen/detail_movie_favorite_btn_size" />
-                </LinearLayout>
+                <Button
+                    android:id="@+id/movie_mark_favorite_btn"
+                    android:layout_width="@dimen/detail_movie_favorite_btn_width"
+                    android:layout_height="@dimen/detail_movie_favorite_btn_height"
+                    android:layout_marginTop="@dimen/detail_movie_favorite_btn_top_margin"
+                    android:background="@color/teal"
+                    android:paddingBottom="@dimen/detail_movie_favorite_btn_padding"
+                    android:paddingTop="@dimen/detail_movie_favorite_btn_padding"
+                    android:text="@string/movie_mark_favorite_label"
+                    android:textAllCaps="true"
+                    android:textSize="@dimen/detail_movie_favorite_btn_size" />
             </LinearLayout>
         </LinearLayout>
         <!-- Movie Overview -->

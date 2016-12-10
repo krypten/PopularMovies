@@ -1,22 +1,19 @@
 package com.cyril.udacity.moviepop.model;
 
 import android.content.Context;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.cyril.udacity.moviepop.R;
 import com.cyril.udacity.moviepop.client.TheMovieDbApi;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -79,7 +76,9 @@ public class MovieAdapter extends ArrayAdapter {
             for (final Movie movie : result) {
                 mMovieList.add(movie);
             }
+            notifyDataSetChanged();
+        } else {
+            Toast.makeText(mContext, "INTERNET CONNECTION NOT PRESENT", Toast.LENGTH_LONG).show();
         }
-        notifyDataSetChanged();
     }
 }

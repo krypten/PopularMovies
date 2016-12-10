@@ -1,7 +1,11 @@
 package com.cyril.udacity.moviepop.client;
 
+import android.app.Activity;
+import android.content.Context;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.cyril.udacity.moviepop.BuildConfig;
 import com.cyril.udacity.moviepop.model.Movie;
@@ -25,12 +29,19 @@ import java.util.List;
 public class APIServiceCall {
     private static final String LOG_TAG = APIServiceCall.class.getSimpleName();
 
-    public List<Movie> call(final String featurePath) {
+    public List<Movie> call(final Activity activity, final String featurePath) {
+        List<Movie> result = null;
+        // Check if the internet connection is available
+        final ConnectivityManager conMgr = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (conMgr.getActiveNetworkInfo() == null
+                || !conMgr.getActiveNetworkInfo().isAvailable()
+                || !conMgr.getActiveNetworkInfo().isConnected()) {
+            return result;
+        }
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
-        List<Movie> result = null;
         try {
             // Construct the URL for the TheMovieDB query
             // Build URI

@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.cyril.udacity.moviepop.client.APIServiceCall;
 import com.cyril.udacity.moviepop.client.TheMovieDbApi;
@@ -19,7 +20,6 @@ import com.cyril.udacity.moviepop.model.Movie;
 import com.cyril.udacity.moviepop.model.MovieAdapter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -30,8 +30,6 @@ public class MovieGridFragment extends Fragment {
 
     MovieAdapter mMovieAdapter;
 
-    private List<Movie> mMovies;
-
     public MovieGridFragment() {
         super();
     }
@@ -41,21 +39,22 @@ public class MovieGridFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        if (savedInstanceState == null || !savedInstanceState.containsKey(Movie.LIST_PARCELABLE_ID)) {
-            mMovies = new ArrayList<>();
-        } else {
-            mMovies = savedInstanceState.getParcelableArrayList(Movie.LIST_PARCELABLE_ID);
-        }
         updateMovieGrid(null);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        List<Movie> movies;
+        if (savedInstanceState == null || !savedInstanceState.containsKey(Movie.LIST_PARCELABLE_ID)) {
+            movies = new ArrayList<>();
+        } else {
+            movies = savedInstanceState.getParcelableArrayList(Movie.LIST_PARCELABLE_ID);
+        }
         mMovieAdapter = new MovieAdapter(
                 getActivity(),
                 R.layout.gridview_item_movie,
-                new ArrayList<Movie>());
+                movies);
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         final GridView gridView = (GridView) rootView.findViewById(R.id.gridview_movie);
         gridView.setAdapter(mMovieAdapter);
@@ -63,7 +62,7 @@ public class MovieGridFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 final Intent intent = new Intent(view.getContext(), MovieDetailActivity.class);
-                intent.putExtra(Movie.PARCELABLE_ID, (Parcelable) mMovieAdapter.getItem(i));
+                intent.putExtra(Movie.PARCELABLE_ID, mMovieAdapter.getItem(i));
                 startActivity(intent);
             }
         });
@@ -101,21 +100,17 @@ public class MovieGridFragment extends Fragment {
     }
 
     private class FetchMovieTask extends AsyncTask<String, Void, List<Movie>> {
-        private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
-
         @Override
         protected List<Movie> doInBackground(String... params) {
             String featureType = TheMovieDbApi.Config.POPULAR_PATH;
             if (params != null && params[0] != null) {
                 featureType = params[0];
             }
-            return new APIServiceCall().call(featureType);
+            return new APIServiceCall().call(getActivity(), featureType);
         }
 
         @Override
         protected void onPostExecute(List<Movie> result) {
-            Log.i(LOG_TAG, String.valueOf(result.size()));
-            Log.i(LOG_TAG, Arrays.toString(result.toArray()));
             if (mMovieAdapter != null) {
                 mMovieAdapter.initialize(result);
             }
