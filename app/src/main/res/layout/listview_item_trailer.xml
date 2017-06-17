@@ -4,6 +4,7 @@
               android:layout_height="wrap_content"
               android:layout_marginBottom="@dimen/list_view_spacing_normal"
               android:layout_marginTop="@dimen/list_view_spacing_normal"
+              android:descendantFocusability="blocksDescendants"
               android:orientation="horizontal">
 
     <ImageButton
