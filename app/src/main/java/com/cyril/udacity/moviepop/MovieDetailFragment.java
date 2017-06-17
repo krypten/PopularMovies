@@ -9,9 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.cyril.udacity.moviepop.client.APIServiceCall;
 import com.cyril.udacity.moviepop.client.TheMovieDbApi;
@@ -58,6 +58,12 @@ public class MovieDetailFragment extends Fragment {
 			final String posterUrl = TheMovieDbApi.getPosterUrl(mMovie.getPosterlUrl(), TheMovieDbApi.SIZE.SMALL);
 			Picasso.with(getActivity()).load(posterUrl).into(posterView);
 			((TextView) rootView.findViewById(R.id.movie_overview)).setText(mMovie.getOverview());
+			rootView.findViewById(R.id.movie_mark_favorite_btn).setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(final View view) {
+					mMovie.setFavorite(((ToggleButton) view).isChecked());
+				}
+			});
 
 			// Movie trailers
 			mTrailerAdapter = new TrailerAdapter(

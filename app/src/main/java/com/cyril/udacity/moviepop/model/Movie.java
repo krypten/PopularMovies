@@ -20,6 +20,7 @@ public class Movie implements Parcelable {
 	private String mReleaseDate;
 	private String mPosterUrl;
 	private double mRating;
+	private boolean mIsFavorite;
 
 	private Movie(final Parcel in) {
 		mId = in.readLong();
@@ -28,6 +29,7 @@ public class Movie implements Parcelable {
 		mReleaseDate = in.readString();
 		mPosterUrl = in.readString();
 		mRating = in.readDouble();
+		mIsFavorite = in.readByte() != 0;
 	}
 
 	public Movie(final JSONObject jsonObject) throws JSONException {
@@ -65,6 +67,10 @@ public class Movie implements Parcelable {
 		return mPosterUrl;
 	}
 
+	public void setFavorite(final boolean favorite) {
+		mIsFavorite = favorite;
+	}
+
 	/**
 	 * Return only the release year of the movie. That would be the first 4 characters of release date.
 	 *
@@ -97,6 +103,7 @@ public class Movie implements Parcelable {
 		parcel.writeString(mReleaseDate);
 		parcel.writeString(mPosterUrl);
 		parcel.writeDouble(mRating);
+		parcel.writeByte((byte) (mIsFavorite ? 1 : 0));
 	}
 
 	// After implementing the `Parcelable` interface, we need to create the

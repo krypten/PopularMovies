@@ -70,7 +70,7 @@
                     android:layout_width="@dimen/detail_movie_favorite_btn_width_height"
                     android:layout_height="@dimen/detail_movie_favorite_btn_width_height"
                     android:layout_marginTop="@dimen/detail_movie_favorite_btn_top_margin"
-                    android:background="@android:drawable/btn_star_big_off"
+                    android:background="@drawable/check"
                     android:contentDescription="@string/movie_mark_favorite_label"
                     android:paddingBottom="@dimen/detail_movie_favorite_btn_padding"
                     android:paddingTop="@dimen/detail_movie_favorite_btn_padding"
