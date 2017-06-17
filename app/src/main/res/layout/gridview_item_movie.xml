@@ -14,5 +14,5 @@
         android:layout_height="match_parent"
         android:layout_margin="@dimen/zero_dimension"
         android:padding="@dimen/zero_dimension"
-        android:scaleType="fitXY" />
+        android:scaleType="centerCrop" />
 </LinearLayout>

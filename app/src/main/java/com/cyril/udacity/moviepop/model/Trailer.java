@@ -66,6 +66,7 @@ public class Trailer implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel parcel, int i) {
 		parcel.writeString(mId);
+		parcel.writeString(mTitle);
 		parcel.writeString(mVideoKey);
 		parcel.writeString(mType);
 		parcel.writeString(mSite);

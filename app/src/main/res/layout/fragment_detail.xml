@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent">
 
     <!-- Movie Title -->
     <LinearLayout
@@ -65,17 +65,17 @@
                     android:textSize="@dimen/detail_movie_rating_size"
                     android:textStyle="bold"/>
 
-                <Button
+                <ToggleButton
                     android:id="@+id/movie_mark_favorite_btn"
-                    android:layout_width="@dimen/detail_movie_favorite_btn_width"
-                    android:layout_height="@dimen/detail_movie_favorite_btn_height"
+                    android:layout_width="@dimen/detail_movie_favorite_btn_width_height"
+                    android:layout_height="@dimen/detail_movie_favorite_btn_width_height"
                     android:layout_marginTop="@dimen/detail_movie_favorite_btn_top_margin"
-                    android:background="@color/teal"
+                    android:background="@android:drawable/btn_star_big_off"
+                    android:contentDescription="@string/movie_mark_favorite_label"
                     android:paddingBottom="@dimen/detail_movie_favorite_btn_padding"
                     android:paddingTop="@dimen/detail_movie_favorite_btn_padding"
-                    android:text="@string/movie_mark_favorite_label"
-                    android:textAllCaps="true"
-                    android:textSize="@dimen/detail_movie_favorite_btn_size"/>
+                    android:textOff=""
+                    android:textOn=""/>
             </LinearLayout>
         </LinearLayout>
 
@@ -91,18 +91,49 @@
             android:paddingStart="@dimen/detail_movie_overview_left_right_padding"/>
 
         <!-- Movie Trailer -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/list_view_spacing_low"
+            android:text="@string/trailer_label"
+            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"/>
+
         <View
             android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_margin="5dp"
-            android:background="@color/colorPrimaryDark"/>
+            android:layout_height="@dimen/line_width"
+            android:layout_marginLeft="@dimen/line_margin"
+            android:layout_marginStart="@dimen/line_margin"
+            android:background="?attr/colorPrimary"/>
 
         <com.github.paolorotolo.expandableheightlistview.ExpandableHeightListView
             android:id="@+id/trailer_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:descendantFocusability="blocksDescendants">
+            android:layout_margin="@dimen/list_view_spacing_normal">
+        </com.github.paolorotolo.expandableheightlistview.ExpandableHeightListView>
+
+        <!-- Movie Reviews -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/list_view_spacing_low"
+            android:text="@string/review_label"
+            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/line_width"
+            android:layout_marginLeft="@dimen/line_margin"
+            android:layout_marginStart="@dimen/line_margin"
+            android:background="?attr/colorPrimary"/>
+
+
+        <com.github.paolorotolo.expandableheightlistview.ExpandableHeightListView
+            android:id="@+id/reviews_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/list_view_spacing_normal">
         </com.github.paolorotolo.expandableheightlistview.ExpandableHeightListView>
     </LinearLayout>
-</ScrollView>
+</android.support.v4.widget.NestedScrollView>

@@ -9,12 +9,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.cyril.udacity.moviepop.client.APIServiceCall;
 import com.cyril.udacity.moviepop.client.TheMovieDbApi;
 import com.cyril.udacity.moviepop.model.Movie;
+import com.cyril.udacity.moviepop.model.Review;
+import com.cyril.udacity.moviepop.model.ReviewAdapter;
 import com.cyril.udacity.moviepop.model.Trailer;
 import com.cyril.udacity.moviepop.model.TrailerAdapter;
 import com.github.paolorotolo.expandableheightlistview.ExpandableHeightListView;
@@ -30,7 +33,8 @@ import java.util.List;
 public class MovieDetailFragment extends Fragment {
 	private final String TAG = MovieDetailFragment.class.getSimpleName();
 
-	TrailerAdapter mTrailerAdapter;
+	private ReviewAdapter mReviewAdapter;
+	private TrailerAdapter mTrailerAdapter;
 	private Movie mMovie;
 
 	@Override
@@ -55,6 +59,7 @@ public class MovieDetailFragment extends Fragment {
 			Picasso.with(getActivity()).load(posterUrl).into(posterView);
 			((TextView) rootView.findViewById(R.id.movie_overview)).setText(mMovie.getOverview());
 
+			// Movie trailers
 			mTrailerAdapter = new TrailerAdapter(
 				getActivity(),
 				R.layout.listview_item_trailer,
@@ -78,6 +83,19 @@ public class MovieDetailFragment extends Fragment {
 			final FetchTrailerTask trailerTask = new FetchTrailerTask();
 			Log.i(TAG, "Executing the trailer task...");
 			trailerTask.execute(getTrailersPath(mMovie));
+
+			// Movie reviews
+			mReviewAdapter = new ReviewAdapter(
+				getActivity(),
+				R.layout.listview_item_review,
+				new ArrayList<Review>());
+			final ExpandableHeightListView reviewsList = (ExpandableHeightListView) rootView.findViewById(R.id.reviews_list);
+			reviewsList.setAdapter(mReviewAdapter);
+			reviewsList.setExpanded(true);
+
+			final FetchReviewTask reviewTask = new FetchReviewTask();
+			Log.i(TAG, "Executing the review task...");
+			reviewTask.execute(getReviewsPath(mMovie));
 		} else {
 			Log.d(TAG, "Movie data not found");
 		}
@@ -93,6 +111,10 @@ public class MovieDetailFragment extends Fragment {
 		return movie.getId() + "/" + TheMovieDbApi.Config.TRAILER_PATH;
 	}
 
+	private String getReviewsPath(final Movie movie) {
+		return movie.getId() + "/" + TheMovieDbApi.Config.REVIEWS_PATH;
+	}
+
 	private class FetchTrailerTask extends AsyncTask<String, Void, List<Trailer>> {
 		@Override
 		protected List<Trailer> doInBackground(String... params) {
@@ -106,6 +128,23 @@ public class MovieDetailFragment extends Fragment {
 		protected void onPostExecute(List<Trailer> result) {
 			if (mTrailerAdapter != null) {
 				mTrailerAdapter.initialize(result);
+			}
+		}
+	}
+
+	private class FetchReviewTask extends AsyncTask<String, Void, List<Review>> {
+		@Override
+		protected List<Review> doInBackground(String... params) {
+			if (params != null && params[0] != null) {
+				return new APIServiceCall().call(getActivity(), params[0]);
+			}
+			return new ArrayList<>();
+		}
+
+		@Override
+		protected void onPostExecute(List<Review> result) {
+			if (mReviewAdapter != null) {
+				mReviewAdapter.initialize(result);
 			}
 		}
 	}

@@ -23,10 +23,10 @@ public class TrailerAdapter extends ArrayAdapter {
 	private List<Trailer> mTrailerList;
 	private LayoutInflater inflater;
 
-	public TrailerAdapter(final Context context, final int resourceId, final List<Trailer> movies) {
-		super(context, resourceId, movies);
+	public TrailerAdapter(final Context context, final int resourceId, final List<Trailer> trailers) {
+		super(context, resourceId, trailers);
 		mContext = context;
-		mTrailerList = new ArrayList<>(movies);
+		mTrailerList = new ArrayList<>(trailers);
 		inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	}
 
@@ -59,10 +59,7 @@ public class TrailerAdapter extends ArrayAdapter {
 		final Trailer trailer = mTrailerList.get(i);
 		((TextView) view.findViewById(R.id.trailer_type)).setText(trailer.getType());
 		((TextView) view.findViewById(R.id.trailer_title)).setText(trailer.getTitle());
-		// final ImageView posterView = (ImageView) view.findViewById(R.id.gridview_item_poster);
-		// final String posterUrl = TheMovieDbApi.getPosterUrl(mTrailerList.get(i).getPosterlUrl(), TheMovieDbApi.SIZE.MEDIUM);
-		// Log.i(TAG, " Poster Url : " + posterUrl);
-		// Picasso.with(mContext).load(posterUrl).into(posterView);
+		view.invalidate();
 		view.requestLayout();
 		return view;
 	}

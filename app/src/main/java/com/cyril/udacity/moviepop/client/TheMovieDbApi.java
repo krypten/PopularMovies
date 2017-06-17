@@ -32,6 +32,9 @@ public class TheMovieDbApi {
 			public static final String VIDEO_KEY = "key";
 			public static final String VIDEO_SITE = "site";
 			public static final String VIDEO_TYPE = "type";
+
+			public static final String REVIEW_AUTHOR = "author";
+			public static final String REVIEW_CONTENT = "content";
 		}
 	}
 
