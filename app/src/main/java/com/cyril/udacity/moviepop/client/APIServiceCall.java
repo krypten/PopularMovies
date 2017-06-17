@@ -5,10 +5,10 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.cyril.udacity.moviepop.BuildConfig;
 import com.cyril.udacity.moviepop.model.Movie;
+import com.cyril.udacity.moviepop.model.Trailer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,10 +27,10 @@ import java.util.List;
  * Class to API Service Call.
  */
 public class APIServiceCall {
-    private static final String LOG_TAG = APIServiceCall.class.getSimpleName();
+    private static final String TAG = APIServiceCall.class.getSimpleName();
 
-    public List<Movie> call(final Activity activity, final String featurePath) {
-        List<Movie> result = null;
+    public <T> List<T> call(final Activity activity, final String featurePath) {
+        List<T> result = null;
         // Check if the internet connection is available
         final ConnectivityManager conMgr = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (conMgr.getActiveNetworkInfo() == null
@@ -48,10 +48,10 @@ public class APIServiceCall {
             Uri uri = Uri.parse(TheMovieDbApi.Config.URL).buildUpon()
                     .appendPath(TheMovieDbApi.VERSION_3.VERSION_ID)
                     .appendPath(TheMovieDbApi.Config.MOVIE_PATH)
-                    .appendPath(featurePath)
+                    .appendEncodedPath(featurePath)
                     .appendQueryParameter(TheMovieDbApi.Config.API_KEY_PARAM, BuildConfig.THE_MOVIE_DB_API_KEY)
                     .build();
-            Log.d(LOG_TAG, "Built URI is " + uri.toString());
+            Log.d(TAG, "Built URI is " + uri.toString());
             // Create the request to TheMovieDB, and open the connection
             urlConnection = (HttpURLConnection) (new URL(uri.toString())).openConnection();
             urlConnection.setRequestMethod("GET");
@@ -77,20 +77,25 @@ public class APIServiceCall {
             }
             // Will contain the raw JSON response as a string.
             final String movieJsonStr = buffer.toString();
-            Log.i(LOG_TAG, movieJsonStr);
+            Log.i(TAG, movieJsonStr);
             // Conversion of response string to Multiple String for display
             result = new ArrayList<>();
             try {
-                JSONObject movieJson = new JSONObject(movieJsonStr);
-                JSONArray movieArray = movieJson.getJSONArray(TheMovieDbApi.VERSION_3.RESPONSE.LIST);
-                for (int i = 0; i < movieArray.length(); i++) {
-                    result.add(Movie.parse(movieArray.getJSONObject(i)));
+                JSONObject responseJson = new JSONObject(movieJsonStr);
+                JSONArray responseArray = responseJson.getJSONArray(TheMovieDbApi.VERSION_3.RESPONSE.LIST);
+                for (int i = 0; i < responseArray.length(); i++) {
+                    final JSONObject obj = responseArray.getJSONObject(i);
+                    if (obj.has(TheMovieDbApi.VERSION_3.RESPONSE.VIDEO_KEY)) {
+                        result.add( (T) new Trailer(obj));
+                    } else {
+                        result.add((T) new Movie(obj));
+                    }
                 }
             } catch (final JSONException e) {
                 e.printStackTrace();
             }
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Error ", e);
+            Log.e(TAG, "Error ", e);
             // If the code didn't successfully get the weather data, there's no point in attemping
             // to parse it.
             return null;
@@ -102,7 +107,7 @@ public class APIServiceCall {
                 try {
                     reader.close();
                 } catch (final IOException e) {
-                    Log.e(LOG_TAG, "Error closing stream", e);
+                    Log.e(TAG, "Error closing stream", e);
                 }
             }
         }

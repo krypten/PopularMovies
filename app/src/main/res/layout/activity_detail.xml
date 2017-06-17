@@ -1,94 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:id="@+id/activity_detail"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:layout_margin="@dimen/zero_dimension"
+             android:padding="@dimen/zero_dimension"
+             tools:context="com.cyril.udacity.moviepop.MovieDetailActivity">
 
-    <!-- Movie Title -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        android:gravity="center_vertical"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/movie_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/teal"
-            android:fontFamily="serif-monospace"
-            android:paddingBottom="@dimen/detail_movie_default_top_bottom_padding"
-            android:paddingEnd="@dimen/detail_movie_default_left_right_padding"
-            android:paddingLeft="@dimen/detail_movie_default_left_right_padding"
-            android:paddingRight="@dimen/detail_movie_default_left_right_padding"
-            android:paddingStart="@dimen/detail_movie_default_left_right_padding"
-            android:paddingTop="@dimen/detail_movie_default_top_bottom_padding"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/detail_movie_title_size" />
-
-        <!-- Movie poster -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/detail_movie_poster_top_bottom_padding"
-            android:layout_marginTop="@dimen/detail_movie_poster_top_bottom_padding">
-
-            <ImageView
-                android:id="@+id/movie_poster"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:gravity="start"
-                android:paddingEnd="@dimen/detail_movie_default_left_right_padding"
-                android:paddingLeft="@dimen/detail_movie_default_left_right_padding"
-                android:paddingRight="@dimen/detail_movie_default_left_right_padding"
-                android:paddingStart="@dimen/detail_movie_default_left_right_padding" />
-
-            <!-- Movie Info -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="@dimen/detail_movie_poster_top_bottom_padding">
-
-                <TextView
-                    android:id="@+id/movie_release_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="serif-monospace"
-                    android:textSize="@dimen/detail_movie_release_date_size" />
-
-                <TextView
-                    android:id="@+id/movie_rating"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/detail_movie_rating_size"
-                    android:textStyle="bold" />
-
-                <Button
-                    android:id="@+id/movie_mark_favorite_btn"
-                    android:layout_width="@dimen/detail_movie_favorite_btn_width"
-                    android:layout_height="@dimen/detail_movie_favorite_btn_height"
-                    android:layout_marginTop="@dimen/detail_movie_favorite_btn_top_margin"
-                    android:background="@color/teal"
-                    android:paddingBottom="@dimen/detail_movie_favorite_btn_padding"
-                    android:paddingTop="@dimen/detail_movie_favorite_btn_padding"
-                    android:text="@string/movie_mark_favorite_label"
-                    android:textAllCaps="true"
-                    android:textSize="@dimen/detail_movie_favorite_btn_size" />
-            </LinearLayout>
-        </LinearLayout>
-        <!-- Movie Overview -->
-
-        <TextView
-            android:id="@+id/movie_overview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingEnd="@dimen/detail_movie_overview_left_right_padding"
-            android:paddingLeft="@dimen/detail_movie_overview_left_right_padding"
-            android:paddingRight="@dimen/detail_movie_overview_left_right_padding"
-            android:paddingStart="@dimen/detail_movie_overview_left_right_padding" />
-    </LinearLayout>
-
-    <!-- Movie Trailer (To be added) -->
-</ScrollView>
+</FrameLayout>
