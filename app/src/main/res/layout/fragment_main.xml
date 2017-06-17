@@ -7,7 +7,7 @@
     android:padding="@dimen/zero_dimension"
     tools:context="com.cyril.udacity.moviepop.MovieGridFragment">
 
-    <GridView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/gridview_movie"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
