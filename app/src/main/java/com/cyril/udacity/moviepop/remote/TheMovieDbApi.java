@@ -1,4 +1,4 @@
-package com.cyril.udacity.moviepop.client;
+package com.cyril.udacity.moviepop.remote;
 
 /**
  * Interface Class for themoviewdb.org API.

@@ -13,8 +13,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import com.cyril.udacity.moviepop.client.APIServiceCall;
-import com.cyril.udacity.moviepop.client.TheMovieDbApi;
+import com.cyril.udacity.moviepop.remote.APIServiceCall;
+import com.cyril.udacity.moviepop.remote.TheMovieDbApi;
 import com.cyril.udacity.moviepop.model.Movie;
 import com.cyril.udacity.moviepop.model.Review;
 import com.cyril.udacity.moviepop.model.ReviewAdapter;

@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
-import com.cyril.udacity.moviepop.client.TheMovieDbApi;
+import com.cyril.udacity.moviepop.remote.TheMovieDbApi;
 
 import org.json.JSONException;
 import org.json.JSONObject;

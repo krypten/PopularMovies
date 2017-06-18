@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import com.cyril.udacity.moviepop.MovieDetailActivity;
 import com.cyril.udacity.moviepop.R;
-import com.cyril.udacity.moviepop.client.TheMovieDbApi;
+import com.cyril.udacity.moviepop.remote.TheMovieDbApi;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
