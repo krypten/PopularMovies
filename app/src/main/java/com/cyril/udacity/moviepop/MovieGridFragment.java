@@ -11,7 +11,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,16 +18,16 @@ import android.view.ViewGroup;
 
 import com.cyril.udacity.moviepop.data.MovieLoader;
 import com.cyril.udacity.moviepop.data.MovieService;
+import com.cyril.udacity.moviepop.data.MoviesContract;
+import com.cyril.udacity.moviepop.data.PrefUtils;
 import com.cyril.udacity.moviepop.model.MovieAdapter;
-import com.cyril.udacity.moviepop.remote.TheMovieDbApi;
 
 /**
  * A Movie Grid fragment containing a simple view.
  */
 public class MovieGridFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-	private final String TAG = MovieGridFragment.class.getSimpleName();
-
 	private static final int MOVIE_LOADER = 0;
+
 	private MovieAdapter mMovieAdapter;
 	private RecyclerView mRecyclerView;
 
@@ -36,7 +35,6 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
-		updateMovieGrid(TheMovieDbApi.Config.TOP_RATED_PATH);
 	}
 
 	@Override
@@ -74,29 +72,22 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-
-		//noinspection SimplifiableIfStatement
 		if (id == R.id.action_sort_by_popularity) {
-			updateMovieGrid(TheMovieDbApi.Config.POPULAR_PATH);
+			updatePreferences(MoviesContract.PATH_MOST_POPULAR);
+			return true;
 		} else if (id == R.id.action_sort_by_rating) {
-			updateMovieGrid(TheMovieDbApi.Config.TOP_RATED_PATH);
+			updatePreferences(MoviesContract.PATH_TOP_RATED);
+			return true;
+		} else if (id == R.id.action_favorites) {
+			updatePreferences(MoviesContract.PATH_FAVORITES);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		if (mMovieAdapter != null) {
-			// outState.putParcelableArrayList(Movie.LIST_PARCELABLE_ID, (ArrayList<? extends Parcelable>) mMovieAdapter.getMovieList());
-		}
-		super.onSaveInstanceState(outState);
-	}
-
-	private void updateMovieGrid(final String featurePath) {
-		// final FetchMovieTask movieTask = new FetchMovieTask();
-		Log.i(TAG, "Executing the Movie task...");
-		// movieTask.execute(featurePath);
+	private void updatePreferences(final String path) {
+		PrefUtils.updatePath(getActivity().getApplicationContext(), path);
+		getLoaderManager().restartLoader(MOVIE_LOADER, null, MovieGridFragment.this);
 	}
 
 	@Override
@@ -108,7 +99,6 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 		mMovieAdapter = new MovieAdapter(getActivity(), data);
 		mRecyclerView.setAdapter(mMovieAdapter);
-		mMovieAdapter.notifyDataSetChanged();
 
 		final int columnCount = getResources().getInteger(R.integer.grid_column_count);
 		final GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), columnCount);

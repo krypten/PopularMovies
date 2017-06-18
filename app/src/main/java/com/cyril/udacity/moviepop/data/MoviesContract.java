@@ -26,6 +26,15 @@ public class MoviesContract {
 
 	public static final String COLUMN_MOVIE_ID_KEY = "movie_id";
 
+	public static Uri getUriFromPath(final String path) {
+		if (PATH_MOST_POPULAR.equals(path)) {
+			return PopularMovies.buildPopularMoviesUri();
+		} else if (PATH_TOP_RATED.equals(path)) {
+			return TopRatedMovies.buildTopRatedMoviesUri();
+		}
+		return FavoriteMovies.buildFavoriteMoviesUri();
+	}
+
 	public static class MovieEntry implements BaseColumns {
 		public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
 		public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
@@ -53,7 +62,7 @@ public class MoviesContract {
 
 		public interface Query {
 			String[] PROJECTION = {
-				MovieEntry._ID,
+				MovieEntry.TABLE_NAME + "." + MovieEntry._ID,
 				MovieEntry.TITLE,
 				MovieEntry.OVERVIEW,
 				MovieEntry.RELEASE_DATE,

@@ -116,7 +116,7 @@ public class MoviesProvider extends ContentProvider {
 		Uri returnUri;
 		switch (sUriMatcher.match(uri)) {
 			case MOVIES: {
-				long _id = db.insert(MovieEntry.TABLE_NAME, null, values);
+				long _id = db.insertWithOnConflict(MovieEntry.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
 				if (_id > 0)
 					returnUri = MovieEntry.buildMovieUri(_id);
 				else
@@ -124,7 +124,7 @@ public class MoviesProvider extends ContentProvider {
 				break;
 			}
 			case POPULAR_MOVIES: {
-				long _id = db.insert(PopularMovies.TABLE_NAME, null, values);
+				long _id = db.insertWithOnConflict(PopularMovies.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
 				if (_id > 0)
 					returnUri = PopularMovies.buildPopularMoviesUri();
 				else
@@ -132,7 +132,7 @@ public class MoviesProvider extends ContentProvider {
 				break;
 			}
 			case TOP_RATED_MOVIES: {
-				long _id = db.insert(TopRatedMovies.TABLE_NAME, null, values);
+				long _id = db.insertWithOnConflict(TopRatedMovies.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
 				if (_id > 0)
 					returnUri = TopRatedMovies.buildTopRatedMoviesUri();
 				else
@@ -141,7 +141,7 @@ public class MoviesProvider extends ContentProvider {
 			}
 
 			case FAVORITE_MOVIES: {
-				long _id = db.insert(FavoriteMovies.TABLE_NAME, null, values);
+				long _id = db.insertWithOnConflict(FavoriteMovies.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
 				if (_id > 0)
 					returnUri = FavoriteMovies.buildFavoriteMoviesUri();
 				else

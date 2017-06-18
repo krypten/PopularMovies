@@ -36,14 +36,22 @@ public class MovieService extends IntentService {
 			|| !conMgr.getActiveNetworkInfo().isConnected()) {
 			return;
 		}
+		final String path = PrefUtils.getPath(getApplicationContext());
+		final Uri pathUri;
+		if (MoviesContract.PATH_FAVORITES.equals(path)) {
+			return;
+		} else {
+			pathUri = MoviesContract.getUriFromPath(path);
+		}
 
 		final ArrayList<ContentProviderOperation> cpo = new ArrayList<>();
 		final Uri dirUri = MoviesContract.MovieEntry.buildDirUri();
 
-		cpo.add(ContentProviderOperation.newDelete(dirUri).build());
+		// cpo.add(ContentProviderOperation.newDelete(dirUri).build());
+		cpo.add(ContentProviderOperation.newDelete(pathUri).build());
 
 		try {
-			List<Movie> movieList = new APIServiceCall().call(MoviesContract.PATH_MOST_POPULAR);
+			List<Movie> movieList = new APIServiceCall().call(path);
 
 			for (final Movie movie : movieList) {
 				final ContentValues values = new ContentValues();
@@ -54,6 +62,10 @@ public class MovieService extends IntentService {
 				values.put(MoviesContract.MovieEntry.POSTER_URL, movie.getPosterlUrl());
 				values.put(MoviesContract.MovieEntry.RATING, movie.getRating());
 				cpo.add(ContentProviderOperation.newInsert(dirUri).withValues(values).build());
+
+				final ContentValues pathValue = new ContentValues();
+				pathValue.put(MoviesContract.COLUMN_MOVIE_ID_KEY, movie.getId());
+				cpo.add(ContentProviderOperation.newInsert(pathUri).withValues(pathValue).build());
 			}
 			getContentResolver().applyBatch(MoviesContract.CONTENT_AUTHORITY, cpo);
 		} catch (RemoteException | OperationApplicationException e) {

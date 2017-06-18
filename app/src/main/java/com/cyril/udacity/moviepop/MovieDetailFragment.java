@@ -1,5 +1,6 @@
 package com.cyril.udacity.moviepop;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.cyril.udacity.moviepop.data.FavoriteService;
@@ -43,7 +45,6 @@ public class MovieDetailFragment extends Fragment implements
 
 	private ReviewAdapter mReviewAdapter;
 	private TrailerAdapter mTrailerAdapter;
-	private Movie mMovie;
 	private Cursor mCursor;
 	private View mRootView;
 	private long mMovieId;
@@ -80,7 +81,8 @@ public class MovieDetailFragment extends Fragment implements
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		outState.putParcelable(Movie.PARCELABLE_ID, mMovie);
+		outState.putLong(Movie.MOVIE_ID, mMovieId);
+		super.onSaveInstanceState(outState);
 	}
 
 	@Override
@@ -111,15 +113,18 @@ public class MovieDetailFragment extends Fragment implements
 		}
 
 		if (mCursor != null) {
-			((TextView) mRootView.findViewById(R.id.movie_title)).setText(mCursor.getString(Query.TITLE));
-			((TextView) mRootView.findViewById(R.id.movie_rating)).setText(mCursor.getString(Query.RATING));
-			((TextView) mRootView.findViewById(R.id.movie_release_date)).setText(mCursor.getString(Query.RELEASE_DATE));
 			final ImageView posterView = (ImageView) mRootView.findViewById(R.id.movie_poster);
 			final String posterUrl = TheMovieDbApi.getPosterUrl(mCursor.getString(Query.POSTER_URL), TheMovieDbApi.SIZE.SMALL);
 			Picasso.with(getActivity()).load(posterUrl).into(posterView);
-			((TextView) mRootView.findViewById(R.id.movie_overview)).setText(mCursor.getString(Query.OVERVIEW));
 
-			mRootView.findViewById(R.id.movie_mark_favorite_btn).setOnClickListener(new View.OnClickListener() {
+			((TextView) mRootView.findViewById(R.id.movie_title)).setText(mCursor.getString(Query.TITLE));
+			((TextView) mRootView.findViewById(R.id.movie_overview)).setText(mCursor.getString(Query.OVERVIEW));
+			((TextView) mRootView.findViewById(R.id.movie_rating)).setText(mCursor.getString(Query.RATING));
+			((TextView) mRootView.findViewById(R.id.movie_release_date)).setText(mCursor.getString(Query.RELEASE_DATE));
+
+			final ToggleButton toggleButton = (ToggleButton) mRootView.findViewById(R.id.movie_mark_favorite_btn);
+			toggleButton.setChecked(isFavorite(Long.toString(mMovieId)));
+			toggleButton.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(final View view) {
 					final Intent intent = new Intent(getActivity(), FavoriteService.class);
@@ -146,7 +151,11 @@ public class MovieDetailFragment extends Fragment implements
 						getActivity(),
 						BuildConfig.YOUTUBE_API_KEY,
 						mTrailerAdapter.getItem(i).getVideoKey());
-					startActivity(intent);
+					try {
+						startActivity(intent);
+					} catch (ActivityNotFoundException activityNotFound) {
+						Toast.makeText(getActivity(), "Youtube player not found for playing videos", Toast.LENGTH_LONG);
+					}
 				}
 			});
 			final long id = mCursor.getLong(Query._ID);
@@ -169,6 +178,22 @@ public class MovieDetailFragment extends Fragment implements
 		} else {
 			Log.d(TAG, "Movie data not found");
 		}
+	}
+
+	private boolean isFavorite(final String id) {
+		boolean isFavorite = false;
+		final Cursor cursor = getContext().getContentResolver().query(
+			MoviesContract.FavoriteMovies.buildFavoriteMoviesUri(),
+			null,
+			MoviesContract.COLUMN_MOVIE_ID_KEY + " = " + id,
+			null,
+			null
+		);
+		if (cursor != null) {
+			isFavorite = cursor.getCount() != 0;
+			cursor.close();
+		}
+		return isFavorite;
 	}
 
 	private String getTrailersPath(final long movieId) {
