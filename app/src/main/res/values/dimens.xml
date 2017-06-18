@@ -5,6 +5,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <!-- Grid View -->
     <dimen name="gridview_column_width">105dp</dimen>
+    <integer name="grid_column_count">2</integer>
     <!-- Movie Detail Activity -->
     <!-- Padding and width specifics -->
     <dimen name="detail_movie_default_top_bottom_padding">50dp</dimen>

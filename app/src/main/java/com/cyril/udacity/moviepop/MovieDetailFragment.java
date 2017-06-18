@@ -1,9 +1,12 @@
 package com.cyril.udacity.moviepop;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,13 +16,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import com.cyril.udacity.moviepop.remote.APIServiceCall;
-import com.cyril.udacity.moviepop.remote.TheMovieDbApi;
+import com.cyril.udacity.moviepop.data.FavoriteService;
+import com.cyril.udacity.moviepop.data.MovieLoader;
+import com.cyril.udacity.moviepop.data.MoviesContract;
+import com.cyril.udacity.moviepop.data.MoviesContract.MovieEntry.Query;
 import com.cyril.udacity.moviepop.model.Movie;
 import com.cyril.udacity.moviepop.model.Review;
 import com.cyril.udacity.moviepop.model.ReviewAdapter;
 import com.cyril.udacity.moviepop.model.Trailer;
 import com.cyril.udacity.moviepop.model.TrailerAdapter;
+import com.cyril.udacity.moviepop.remote.APIServiceCall;
+import com.cyril.udacity.moviepop.remote.TheMovieDbApi;
 import com.github.paolorotolo.expandableheightlistview.ExpandableHeightListView;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.squareup.picasso.Picasso;
@@ -30,38 +37,95 @@ import java.util.List;
 /**
  * Movie Detail Activity for showing the details for Movie.
  */
-public class MovieDetailFragment extends Fragment {
+public class MovieDetailFragment extends Fragment implements
+	LoaderManager.LoaderCallbacks<Cursor> {
 	private final String TAG = MovieDetailFragment.class.getSimpleName();
 
 	private ReviewAdapter mReviewAdapter;
 	private TrailerAdapter mTrailerAdapter;
 	private Movie mMovie;
+	private Cursor mCursor;
+	private View mRootView;
+	private long mMovieId;
+
+	@Override
+	public void onCreate(final Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		final Intent intent = getActivity().getIntent();
+		if (intent != null && intent.getData() != null) {
+			mMovieId = MoviesContract.MovieEntry.getMovieId(intent.getData());
+		}
+	}
+
+	@Override
+	public void onActivityCreated(final Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+
+		// In support library r8, calling initLoader for a fragment in a FragmentPagerAdapter in
+		// the fragment's onCreate may cause the same LoaderManager to be dealt to multiple
+		// fragments because their mIndex is -1 (haven't been added to the activity yet). Thus,
+		// we do this in onActivityCreated.
+		getLoaderManager().initLoader(0, null, this);
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	                         Bundle savedInstanceState) {
-
-		final Intent intent = getActivity().getIntent();
-		// Movie Object
-		if (intent != null) {
-			mMovie = intent.getParcelableExtra(Movie.PARCELABLE_ID);
-		} else if (savedInstanceState != null && savedInstanceState.containsKey(Movie.PARCELABLE_ID)) {
-			mMovie = savedInstanceState.getParcelable(Movie.PARCELABLE_ID);
-		}
 		// Populate the movie view
-		final View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-		if (mMovie != null) {
-			((TextView) rootView.findViewById(R.id.movie_title)).setText(mMovie.getTitle());
-			((TextView) rootView.findViewById(R.id.movie_rating)).setText(mMovie.getRating());
-			((TextView) rootView.findViewById(R.id.movie_release_date)).setText(mMovie.getReleaseYear());
-			final ImageView posterView = (ImageView) rootView.findViewById(R.id.movie_poster);
-			final String posterUrl = TheMovieDbApi.getPosterUrl(mMovie.getPosterlUrl(), TheMovieDbApi.SIZE.SMALL);
+		mRootView = inflater.inflate(R.layout.fragment_detail, container, false);
+		bindViews();
+		return mRootView;
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putParcelable(Movie.PARCELABLE_ID, mMovie);
+	}
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+		return MovieLoader.newMovieInstance(getActivity(), mMovieId);
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+		mCursor = data;
+		if (mCursor != null && !mCursor.moveToFirst()) {
+			Log.e(TAG, "Error reading item detail cursor");
+			mCursor.close();
+			mCursor = null;
+		}
+		bindViews();
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> loader) {
+		mCursor = null;
+		bindViews();
+	}
+
+	private void bindViews() {
+		if (mRootView == null) {
+			return;
+		}
+
+		if (mCursor != null) {
+			((TextView) mRootView.findViewById(R.id.movie_title)).setText(mCursor.getString(Query.TITLE));
+			((TextView) mRootView.findViewById(R.id.movie_rating)).setText(mCursor.getString(Query.RATING));
+			((TextView) mRootView.findViewById(R.id.movie_release_date)).setText(mCursor.getString(Query.RELEASE_DATE));
+			final ImageView posterView = (ImageView) mRootView.findViewById(R.id.movie_poster);
+			final String posterUrl = TheMovieDbApi.getPosterUrl(mCursor.getString(Query.POSTER_URL), TheMovieDbApi.SIZE.SMALL);
 			Picasso.with(getActivity()).load(posterUrl).into(posterView);
-			((TextView) rootView.findViewById(R.id.movie_overview)).setText(mMovie.getOverview());
-			rootView.findViewById(R.id.movie_mark_favorite_btn).setOnClickListener(new View.OnClickListener() {
+			((TextView) mRootView.findViewById(R.id.movie_overview)).setText(mCursor.getString(Query.OVERVIEW));
+
+			mRootView.findViewById(R.id.movie_mark_favorite_btn).setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(final View view) {
-					mMovie.setFavorite(((ToggleButton) view).isChecked());
+					final Intent intent = new Intent(getActivity(), FavoriteService.class);
+					intent.putExtra(Movie.MOVIE_ID, mMovieId);
+					intent.putExtra(Movie.FAVORITE, ((ToggleButton) view).isChecked());
+					getActivity().startService(intent);
 				}
 			});
 
@@ -70,7 +134,7 @@ public class MovieDetailFragment extends Fragment {
 				getActivity(),
 				R.layout.listview_item_trailer,
 				new ArrayList<Trailer>());
-			final ExpandableHeightListView trailersList = (ExpandableHeightListView) rootView.findViewById(R.id.trailer_list);
+			final ExpandableHeightListView trailersList = (ExpandableHeightListView) mRootView.findViewById(R.id.trailer_list);
 			trailersList.setAdapter(mTrailerAdapter);
 			trailersList.setExpanded(true);
 
@@ -85,41 +149,37 @@ public class MovieDetailFragment extends Fragment {
 					startActivity(intent);
 				}
 			});
-
+			final long id = mCursor.getLong(Query._ID);
 			final FetchTrailerTask trailerTask = new FetchTrailerTask();
 			Log.i(TAG, "Executing the trailer task...");
-			trailerTask.execute(getTrailersPath(mMovie));
+			trailerTask.execute(getTrailersPath(id));
 
 			// Movie reviews
 			mReviewAdapter = new ReviewAdapter(
 				getActivity(),
 				R.layout.listview_item_review,
 				new ArrayList<Review>());
-			final ExpandableHeightListView reviewsList = (ExpandableHeightListView) rootView.findViewById(R.id.reviews_list);
+			final ExpandableHeightListView reviewsList = (ExpandableHeightListView) mRootView.findViewById(R.id.reviews_list);
 			reviewsList.setAdapter(mReviewAdapter);
 			reviewsList.setExpanded(true);
 
 			final FetchReviewTask reviewTask = new FetchReviewTask();
 			Log.i(TAG, "Executing the review task...");
-			reviewTask.execute(getReviewsPath(mMovie));
+			reviewTask.execute(getReviewsPath(id));
 		} else {
 			Log.d(TAG, "Movie data not found");
 		}
-		return rootView;
 	}
 
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		outState.putParcelable(Movie.PARCELABLE_ID, mMovie);
+	private String getTrailersPath(final long movieId) {
+		return movieId + "/" + TheMovieDbApi.Config.TRAILER_PATH;
 	}
 
-	private String getTrailersPath(final Movie movie) {
-		return movie.getId() + "/" + TheMovieDbApi.Config.TRAILER_PATH;
+	private String getReviewsPath(final long movieId) {
+		return movieId + "/" + TheMovieDbApi.Config.REVIEWS_PATH;
 	}
 
-	private String getReviewsPath(final Movie movie) {
-		return movie.getId() + "/" + TheMovieDbApi.Config.REVIEWS_PATH;
-	}
+	/* ASYNC TASK CLASSES */
 
 	private class FetchTrailerTask extends AsyncTask<String, Void, List<Trailer>> {
 		@Override

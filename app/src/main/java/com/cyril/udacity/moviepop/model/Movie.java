@@ -12,6 +12,8 @@ import org.json.JSONObject;
 public class Movie implements Parcelable {
 	public static final String PARCELABLE_ID = "MOVIE";
 	public static final String LIST_PARCELABLE_ID = "MOVIES";
+	public static final String MOVIE_ID = "MOVIE_ID";
+	public static final String FAVORITE = "FAVORITE";
 	private static final String LOG_TAG = "MOVIE";
 
 	private long mId;

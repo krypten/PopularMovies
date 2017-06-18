@@ -6,69 +6,47 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.cyril.udacity.moviepop.data.MoviesContract.FavoriteMovies;
 import com.cyril.udacity.moviepop.data.MoviesContract.MovieEntry;
-import com.cyril.udacity.moviepop.data.MoviesContract.ReviewEntry;
-import com.cyril.udacity.moviepop.data.MoviesContract.TrailerEntry;
+import com.cyril.udacity.moviepop.data.MoviesContract.PopularMovies;
+import com.cyril.udacity.moviepop.data.MoviesContract.TopRatedMovies;
+
+import static com.cyril.udacity.moviepop.data.MoviesContract.PATH_FAVORITES;
+import static com.cyril.udacity.moviepop.data.MoviesContract.PATH_MOST_POPULAR;
+import static com.cyril.udacity.moviepop.data.MoviesContract.PATH_MOVIE;
+import static com.cyril.udacity.moviepop.data.MoviesContract.PATH_TOP_RATED;
 
 /**
  * Created by krypten on 6/17/17.
  */
 public class MoviesProvider extends ContentProvider {
-	private SQLiteOpenHelper mDBHelper;
+	private static final String MOVIE_ID_SELECTION = MovieEntry.TABLE_NAME + "." + MovieEntry._ID + " = ? ";
 
 	private static final int MOVIES = 100;
 	private static final int MOVIES__ID = 101;
-	private static final int MOVIE_REVIEWS = 102;
-	private static final int MOVIE_TRAILERS = 103;
-	private static final int REVIEWS = 200;
-	private static final int TRAILERS = 300;
-
-	/*
-	private static final SQLiteQueryBuilder sTrailerByMovieQueryBuilder;
-	private static final SQLiteQueryBuilder sReviewByMovieQueryBuilder;
-
-	static {
-		sTrailerByMovieQueryBuilder = new SQLiteQueryBuilder();
-		sReviewByMovieQueryBuilder = new SQLiteQueryBuilder();
-
-		//This is an inner join which looks like
-		//movies INNER JOIN trailers ON movies._id = trailers.movie_id
-		sTrailerByMovieQueryBuilder.setTables(
-			MovieEntry.TABLE_NAME + " INNER JOIN " +
-				TrailerEntry.TABLE_NAME +
-				" ON " + TrailerEntry.TABLE_NAME +
-				"." + TrailerEntry.MOVIE_KEY +
-				" = " + MovieEntry.TABLE_NAME +
-				"." + MovieEntry._ID);
-
-		//This is an inner join which looks like
-		//movies INNER JOIN reviews ON movies._id = review.movie_id
-		sReviewByMovieQueryBuilder.setTables(
-			MovieEntry.TABLE_NAME + " INNER JOIN " +
-				ReviewEntry.TABLE_NAME +
-				" ON " + ReviewEntry.TABLE_NAME +
-				"." + ReviewEntry.MOVIE_KEY +
-				" = " + MovieEntry.TABLE_NAME +
-				"." + MovieEntry._ID);
-	}
-	*/
+	private static final int POPULAR_MOVIES = 200;
+	private static final int TOP_RATED_MOVIES = 300;
+	private static final int FAVORITE_MOVIES = 400;
 
 	private static final UriMatcher sUriMatcher = buildUriMatcher();
 
 	private static UriMatcher buildUriMatcher() {
 		final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
 		final String authority = MoviesContract.CONTENT_AUTHORITY;
-		matcher.addURI(authority, MoviesContract.PATH_MOVIE, MOVIES);
-		matcher.addURI(authority, MoviesContract.PATH_MOVIE + "/#", MOVIES__ID);
-		matcher.addURI(authority, MoviesContract.PATH_MOVIE + "/#/" + MoviesContract.PATH_TRAILER, MOVIE_TRAILERS);
-		matcher.addURI(authority, MoviesContract.PATH_MOVIE + "/#/" + MoviesContract.PATH_REVIEW, MOVIE_REVIEWS);
-		matcher.addURI(authority, MoviesContract.PATH_TRAILER, TRAILERS);
-		matcher.addURI(authority, MoviesContract.PATH_REVIEW, REVIEWS);
+		matcher.addURI(authority, PATH_MOVIE, MOVIES);
+		matcher.addURI(authority, PATH_MOVIE + "/#", MOVIES__ID);
+		matcher.addURI(authority, PATH_MOVIE + "/" + PATH_MOST_POPULAR, POPULAR_MOVIES);
+		matcher.addURI(authority, PATH_MOVIE + "/" + PATH_TOP_RATED, TOP_RATED_MOVIES);
+		matcher.addURI(authority, PATH_MOVIE + "/" + PATH_FAVORITES, FAVORITE_MOVIES);
 		return matcher;
 	}
+
+	private SQLiteOpenHelper mDBHelper;
 
 	@Override
 	public boolean onCreate() {
@@ -76,44 +54,13 @@ public class MoviesProvider extends ContentProvider {
 		return true;
 	}
 
-	private Cursor getMovieTrailers(SQLiteDatabase db, Uri uri, String[] projection, String sortOrder) {
-		final long movieId = MovieEntry.getMovieId(uri);
-		final String selection = TrailerEntry.MOVIE_KEY + " = ? ";
-		final String[] selectionArgs = new String[]{String.valueOf(movieId)};
-		return db.query(
-			TrailerEntry.TABLE_NAME,
-			projection,
-			selection,
-			selectionArgs,
-			null,
-			null,
-			sortOrder
-		);
-	}
-
-	private Cursor getMovieReviews(SQLiteDatabase db, Uri uri, String[] projection, String sortOrder) {
-		final long movieId = MovieEntry.getMovieId(uri);
-		final String selection = ReviewEntry.MOVIE_KEY + " = ? ";
-		final String[] selectionArgs = new String[]{String.valueOf(movieId)};
-		return db.query(
-			ReviewEntry.TABLE_NAME,
-			projection,
-			selection,
-			selectionArgs,
-			null,
-			null,
-			sortOrder
-		);
-	}
-
 	@Nullable
 	@Override
-	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+	public Cursor query(final Uri uri, final String[] projection, final String selection, final String[] selectionArgs, final String sortOrder) {
 		final SQLiteDatabase db = mDBHelper.getReadableDatabase();
 		Cursor retCursor;
 		switch (sUriMatcher.match(uri)) {
 			case MOVIES:
-			case MOVIES__ID:
 				retCursor = db.query(
 					MovieEntry.TABLE_NAME,
 					projection,
@@ -124,33 +71,17 @@ public class MoviesProvider extends ContentProvider {
 					sortOrder
 				);
 				break;
-			case MOVIE_TRAILERS:
-				retCursor = getMovieTrailers(db, uri, projection, sortOrder);
+			case MOVIES__ID:
+				retCursor = getMovieById(db, uri, projection, sortOrder);
 				break;
-			case MOVIE_REVIEWS:
-				retCursor = getMovieReviews(db, uri, projection, sortOrder);
+			case POPULAR_MOVIES:
+				retCursor = getMoviesByReference(db, PopularMovies.TABLE_NAME, selection, selectionArgs, projection, sortOrder);
 				break;
-			case REVIEWS:
-				retCursor = db.query(
-					ReviewEntry.TABLE_NAME,
-					projection,
-					selection,
-					selectionArgs,
-					null,
-					null,
-					sortOrder
-				);
+			case TOP_RATED_MOVIES:
+				retCursor = getMoviesByReference(db, TopRatedMovies.TABLE_NAME, selection, selectionArgs, projection, sortOrder);
 				break;
-			case TRAILERS:
-				retCursor = db.query(
-					TrailerEntry.TABLE_NAME,
-					projection,
-					selection,
-					selectionArgs,
-					null,
-					null,
-					sortOrder
-				);
+			case FAVORITE_MOVIES:
+				retCursor = getMoviesByReference(db, FavoriteMovies.TABLE_NAME, selection, selectionArgs, projection, sortOrder);
 				break;
 			default:
 				throw new UnsupportedOperationException("Query for unknown uri: " + uri);
@@ -162,16 +93,17 @@ public class MoviesProvider extends ContentProvider {
 	@Nullable
 	@Override
 	public String getType(final Uri uri) {
-		final int match = sUriMatcher.match(uri);
-		switch (match) {
+		switch (sUriMatcher.match(uri)) {
 			case MOVIES:
 				return MovieEntry.CONTENT_TYPE;
 			case MOVIES__ID:
 				return MovieEntry.CONTENT_ITEM_TYPE;
-			case TRAILERS:
-				return TrailerEntry.CONTENT_TYPE;
-			case REVIEWS:
-				return ReviewEntry.CONTENT_TYPE;
+			case POPULAR_MOVIES:
+				return PopularMovies.CONTENT_TYPE;
+			case TOP_RATED_MOVIES:
+				return TopRatedMovies.CONTENT_TYPE;
+			case FAVORITE_MOVIES:
+				return FavoriteMovies.CONTENT_TYPE;
 			default:
 				throw new UnsupportedOperationException("Unknown uri: " + uri);
 		}
@@ -179,32 +111,39 @@ public class MoviesProvider extends ContentProvider {
 
 	@Nullable
 	@Override
-	public Uri insert(Uri uri, ContentValues values) {
+	public Uri insert(final Uri uri, final ContentValues values) {
 		final SQLiteDatabase db = mDBHelper.getWritableDatabase();
-		final int match = sUriMatcher.match(uri);
 		Uri returnUri;
-
-		switch (match) {
+		switch (sUriMatcher.match(uri)) {
 			case MOVIES: {
 				long _id = db.insert(MovieEntry.TABLE_NAME, null, values);
-				if ( _id > 0 )
+				if (_id > 0)
 					returnUri = MovieEntry.buildMovieUri(_id);
 				else
 					throw new android.database.SQLException("Failed to insert row into " + uri);
 				break;
 			}
-			case REVIEWS: {
-				long _id = db.insert(ReviewEntry.TABLE_NAME, null, values);
-				if ( _id > 0 )
-					returnUri = ReviewEntry.buildReviewUri(_id);
+			case POPULAR_MOVIES: {
+				long _id = db.insert(PopularMovies.TABLE_NAME, null, values);
+				if (_id > 0)
+					returnUri = PopularMovies.buildPopularMoviesUri();
 				else
 					throw new android.database.SQLException("Failed to insert row into " + uri);
 				break;
 			}
-			case TRAILERS: {
-				long _id = db.insert(TrailerEntry.TABLE_NAME, null, values);
-				if ( _id > 0 )
-					returnUri = TrailerEntry.buildTrailerUri(_id);
+			case TOP_RATED_MOVIES: {
+				long _id = db.insert(TopRatedMovies.TABLE_NAME, null, values);
+				if (_id > 0)
+					returnUri = TopRatedMovies.buildTopRatedMoviesUri();
+				else
+					throw new android.database.SQLException("Failed to insert row into " + uri);
+				break;
+			}
+
+			case FAVORITE_MOVIES: {
+				long _id = db.insert(FavoriteMovies.TABLE_NAME, null, values);
+				if (_id > 0)
+					returnUri = FavoriteMovies.buildFavoriteMoviesUri();
 				else
 					throw new android.database.SQLException("Failed to insert row into " + uri);
 				break;
@@ -217,12 +156,102 @@ public class MoviesProvider extends ContentProvider {
 	}
 
 	@Override
-	public int delete(Uri uri, String selection, String[] selectionArgs) {
+	public int bulkInsert(@NonNull final Uri uri, @NonNull final ContentValues[] values) {
+		final SQLiteDatabase db = mDBHelper.getWritableDatabase();
+		int insertCount = 0;
+		;
+		switch (sUriMatcher.match(uri)) {
+			case MOVIES:
+				db.beginTransaction();
+				try {
+					for (final ContentValues value : values) {
+						final long id = db.insertWithOnConflict(MovieEntry.TABLE_NAME, null, value, SQLiteDatabase.CONFLICT_REPLACE);
+						if (id != -1) {
+							insertCount++;
+						}
+					}
+				} finally {
+					db.endTransaction();
+				}
+				getContext().getContentResolver().notifyChange(uri, null);
+				return insertCount;
+			default:
+				insertCount = super.bulkInsert(uri, values);
+		}
+		return insertCount;
+	}
+
+	@Override
+	public int delete(final Uri uri, final String selection, final String[] selectionArgs) {
+		final SQLiteDatabase db = mDBHelper.getWritableDatabase();
+		int rowsDeleted;
+		switch (sUriMatcher.match(uri)) {
+			case MOVIES:
+				rowsDeleted = db.delete(MovieEntry.TABLE_NAME, selection, selectionArgs);
+				break;
+			case MOVIES__ID:
+				final long id = MovieEntry.getMovieId(uri);
+				rowsDeleted = db.delete(MovieEntry.TABLE_NAME,
+					MOVIE_ID_SELECTION, new String[]{Long.toString(id)});
+				break;
+			case POPULAR_MOVIES:
+				rowsDeleted = db.delete(PopularMovies.TABLE_NAME, selection, selectionArgs);
+				break;
+			case TOP_RATED_MOVIES:
+				rowsDeleted = db.delete(TopRatedMovies.TABLE_NAME, selection, selectionArgs);
+				break;
+			case FAVORITE_MOVIES:
+				rowsDeleted = db.delete(FavoriteMovies.TABLE_NAME, selection, selectionArgs);
+				break;
+			default:
+				throw new UnsupportedOperationException("Unknown uri: " + uri);
+		}
+		if (rowsDeleted != 0) {
+			getContext().getContentResolver().notifyChange(uri, null);
+		}
+		return rowsDeleted;
+	}
+
+	@Override
+	public int update(final Uri uri, final ContentValues values, final String selection, final String[] selectionArgs) {
 		return 0;
 	}
 
 	@Override
-	public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-		return 0;
+	public void shutdown() {
+		mDBHelper.close();
+		super.shutdown();
+	}
+
+	/* QUERY UTILITY METHODS */
+
+	private Cursor getMovieById(final SQLiteDatabase db, final Uri uri, final String[] projection, final String sortOrder) {
+		final String[] selectionArgs = new String[]{Long.toString(MovieEntry.getMovieId(uri))};
+		return db.query(
+			MovieEntry.TABLE_NAME,
+			projection,
+			MOVIE_ID_SELECTION,
+			selectionArgs,
+			null,
+			null,
+			sortOrder
+		);
+	}
+
+	private Cursor getMoviesByReference(final SQLiteDatabase db, final String tableName, final String selection, final String[] selectionArgs, final String[] projection, final String sortOrder) {
+		final SQLiteQueryBuilder sqLiteQueryBuilder = new SQLiteQueryBuilder();
+		// tableName INNER JOIN movies ON tableName.movie_id = movies._id
+		sqLiteQueryBuilder.setTables(tableName + " INNER JOIN " + MovieEntry.TABLE_NAME
+			+ " ON " + tableName + "." + MoviesContract.COLUMN_MOVIE_ID_KEY
+			+ " = " + MovieEntry.TABLE_NAME + "." + MovieEntry._ID);
+		return sqLiteQueryBuilder.query(
+			db,
+			projection,
+			selection,
+			selectionArgs,
+			null,
+			null,
+			sortOrder
+		);
 	}
 }

@@ -31,7 +31,6 @@ public class APIServiceCall {
 	private static final String TAG = APIServiceCall.class.getSimpleName();
 
 	public <T> List<T> call(final Activity activity, final String featurePath) {
-		List<T> result = null;
 		if (activity == null) {
 			return null;
 		}
@@ -40,8 +39,13 @@ public class APIServiceCall {
 		if (conMgr.getActiveNetworkInfo() == null
 			|| !conMgr.getActiveNetworkInfo().isAvailable()
 			|| !conMgr.getActiveNetworkInfo().isConnected()) {
-			return result;
+			return null;
 		}
+		return call(featurePath);
+	}
+
+	public <T> List<T> call(final String featurePath) {
+		List<T> result = null;
 		// These two need to be declared outside the try/catch
 		// so that they can be closed in the finally block.
 		HttpURLConnection urlConnection = null;
