@@ -20,13 +20,11 @@ android {
 
     buildTypes.each {
         it.buildConfigField 'String', 'THE_MOVIE_DB_API_KEY', "$System.env.THE_MOVIE_DB_API_KEY"
-        it.buildConfigField 'String', 'YOUTUBE_API_KEY', "$System.env.YOUTUBE_API_KEY"
     }
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile files('lib/YouTubeAndroidPlayerApi.jar')
 
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
@@ -37,5 +35,4 @@ dependencies {
     compile 'com.github.paolorotolo:expandableheightlistview:1.0.0'
 
     testCompile 'junit:junit:4.12'
-
 }

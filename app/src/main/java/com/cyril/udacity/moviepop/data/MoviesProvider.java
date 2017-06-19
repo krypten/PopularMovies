@@ -56,7 +56,11 @@ public class MoviesProvider extends ContentProvider {
 
 	@Nullable
 	@Override
-	public Cursor query(final Uri uri, final String[] projection, final String selection, final String[] selectionArgs, final String sortOrder) {
+	public Cursor query(final Uri uri,
+	                    final String[] projection,
+	                    final String selection,
+	                    final String[] selectionArgs,
+	                    final String sortOrder) {
 		final SQLiteDatabase db = mDBHelper.getReadableDatabase();
 		Cursor retCursor;
 		switch (sUriMatcher.match(uri)) {
@@ -238,7 +242,12 @@ public class MoviesProvider extends ContentProvider {
 		);
 	}
 
-	private Cursor getMoviesByReference(final SQLiteDatabase db, final String tableName, final String selection, final String[] selectionArgs, final String[] projection, final String sortOrder) {
+	private Cursor getMoviesByReference(final SQLiteDatabase db,
+	                                    final String tableName,
+	                                    final String selection,
+	                                    final String[] selectionArgs,
+	                                    final String[] projection,
+	                                    final String sortOrder) {
 		final SQLiteQueryBuilder sqLiteQueryBuilder = new SQLiteQueryBuilder();
 		// tableName INNER JOIN movies ON tableName.movie_id = movies._id
 		sqLiteQueryBuilder.setTables(tableName + " INNER JOIN " + MovieEntry.TABLE_NAME

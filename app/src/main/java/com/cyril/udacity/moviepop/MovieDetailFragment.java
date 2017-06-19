@@ -1,8 +1,8 @@
 package com.cyril.udacity.moviepop;
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.cyril.udacity.moviepop.data.FavoriteService;
@@ -30,7 +29,6 @@ import com.cyril.udacity.moviepop.model.TrailerAdapter;
 import com.cyril.udacity.moviepop.remote.APIServiceCall;
 import com.cyril.udacity.moviepop.remote.TheMovieDbApi;
 import com.github.paolorotolo.expandableheightlistview.ExpandableHeightListView;
-import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -42,6 +40,8 @@ import java.util.List;
 public class MovieDetailFragment extends Fragment implements
 	LoaderManager.LoaderCallbacks<Cursor> {
 	private final String TAG = MovieDetailFragment.class.getSimpleName();
+
+	private static final String YOUTUBE_BASE_URL = "https://www.youtube.com/watch?v=";
 
 	private ReviewAdapter mReviewAdapter;
 	private TrailerAdapter mTrailerAdapter;
@@ -146,16 +146,13 @@ public class MovieDetailFragment extends Fragment implements
 			trailersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
-					Log.i(TAG, "Starting the YouTubeStandalonePlayer ...");
-					Intent intent = YouTubeStandalonePlayer.createVideoIntent(
-						getActivity(),
-						BuildConfig.YOUTUBE_API_KEY,
-						mTrailerAdapter.getItem(i).getVideoKey());
-					try {
-						startActivity(intent);
-					} catch (ActivityNotFoundException activityNotFound) {
-						Toast.makeText(getActivity(), "Youtube player not found for playing videos", Toast.LENGTH_LONG);
-					}
+					Log.i(TAG, "Starting the video in YouTube ...");
+					startActivity(
+						new Intent(
+							Intent.ACTION_VIEW,
+							Uri.parse(YOUTUBE_BASE_URL + mTrailerAdapter.getItem(i).getVideoKey())
+						)
+					);
 				}
 			});
 			final long id = mCursor.getLong(Query._ID);

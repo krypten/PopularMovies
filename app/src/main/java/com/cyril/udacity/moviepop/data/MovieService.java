@@ -72,6 +72,6 @@ public class MovieService extends IntentService {
 			e.printStackTrace();
 			Log.e(TAG, "Error updating content.", e);
 		}
-		sendStickyBroadcast(new Intent(BROADCAST_ACTION_STATE_CHANGE));
+		// sendStickyBroadcast(new Intent(BROADCAST_ACTION_STATE_CHANGE));
 	}
 }

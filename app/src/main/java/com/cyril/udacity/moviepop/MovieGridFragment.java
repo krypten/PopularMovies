@@ -27,9 +27,12 @@ import com.cyril.udacity.moviepop.model.MovieAdapter;
  */
 public class MovieGridFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 	private static final int MOVIE_LOADER = 0;
+	private static final String SCROLL_OFFSET = "SCROLL_OFFSET";
 
 	private MovieAdapter mMovieAdapter;
 	private RecyclerView mRecyclerView;
+	private int mOffset;
+	private int mLoadCount;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -42,19 +45,29 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 		super.onStart();
 		getActivity().registerReceiver(mRefreshingReceiver,
 			new IntentFilter(MovieService.BROADCAST_ACTION_STATE_CHANGE));
+
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
 	}
 
 	@Override
 	public void onStop() {
 		super.onStop();
 		getActivity().unregisterReceiver(mRefreshingReceiver);
+		getLoaderManager().destroyLoader(MOVIE_LOADER);
 	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		getLoaderManager().initLoader(MOVIE_LOADER, null, this);
 		getActivity().startService(new Intent(getActivity(), MovieService.class));
+		getLoaderManager().initLoader(MOVIE_LOADER, null, this);
+		if (savedInstanceState != null) {
+			mOffset = savedInstanceState.getInt(SCROLL_OFFSET, 0);
+		}
 	}
 
 	@Override
@@ -65,6 +78,11 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 		return rootView;
 	}
 
+	@Override
+	public void onSaveInstanceState(Bundle state) {
+		super.onSaveInstanceState(state);
+		state.putInt(SCROLL_OFFSET, mRecyclerView.computeVerticalScrollOffset());
+	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -99,6 +117,15 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 		mMovieAdapter = new MovieAdapter(getActivity(), data);
 		mRecyclerView.setAdapter(mMovieAdapter);
+		mRecyclerView.post(new Runnable() {
+			@Override
+			public void run() {
+				mLoadCount += 1;
+				if (mLoadCount > 1) {
+					mRecyclerView.smoothScrollBy(0, mOffset);
+				}
+			}
+		});
 
 		final int columnCount = getResources().getInteger(R.integer.grid_column_count);
 		final GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), columnCount);
