@@ -6,6 +6,5 @@
              android:layout_height="match_parent"
              android:layout_margin="@dimen/zero_dimension"
              android:padding="@dimen/zero_dimension"
-             tools:context="com.cyril.udacity.moviepop.MovieDetailActivity">
-
+             tools:context="com.innovation.studio.moviepop.MovieDetailActivity">
 </FrameLayout>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.cyril.udacity.moviepop">
+          package="com.innovation.studio.moviepop">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.BROADCAST_STICKY"/>
@@ -12,7 +12,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar">
-        <activity android:name=".MainActivity">
+        <activity android:name="com.innovation.studio.moviepop.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -20,26 +20,26 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MovieDetailActivity"
+            android:name="com.innovation.studio.moviepop.MovieDetailActivity"
             android:label="Movie Details"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName="com.innovation.studio.moviepop.MainActivity">
             <!-- The meta-data element is needed for versions lower than 4.1 -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity"/>
+                android:value="com.innovation.studio.moviepop.MainActivity"/>
         </activity>
 
         <service
-            android:name=".data.MovieService"
+            android:name="com.innovation.studio.moviepop.data.MovieService"
             android:exported="false"/>
 
         <service
-            android:name=".data.FavoriteService"
+            android:name="com.innovation.studio.moviepop.data.FavoriteService"
             android:exported="false"/>
 
         <provider
-            android:name="com.cyril.udacity.moviepop.data.MoviesProvider"
-            android:authorities="com.cyril.udacity.moviepop"
+            android:name="com.innovation.studio.moviepop.data.MoviesProvider"
+            android:authorities="com.innovation.studio.moviepop"
             android:exported="false"/>
     </application>
 </manifest>

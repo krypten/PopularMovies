@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:layout_margin="@dimen/zero_dimension"
     android:padding="@dimen/zero_dimension"
-    tools:context="com.cyril.udacity.moviepop.MovieGridFragment">
+    tools:context="com.innovation.studio.moviepop.MovieGridFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/gridview_movie"
