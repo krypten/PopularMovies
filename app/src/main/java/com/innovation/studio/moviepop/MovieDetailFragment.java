@@ -17,7 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import com.innovation.studio.moviepop.R;
+import com.github.paolorotolo.expandableheightlistview.ExpandableHeightListView;
 import com.innovation.studio.moviepop.data.FavoriteService;
 import com.innovation.studio.moviepop.data.MovieLoader;
 import com.innovation.studio.moviepop.data.MoviesContract;
@@ -29,7 +29,6 @@ import com.innovation.studio.moviepop.model.Trailer;
 import com.innovation.studio.moviepop.model.TrailerAdapter;
 import com.innovation.studio.moviepop.remote.APIServiceCall;
 import com.innovation.studio.moviepop.remote.TheMovieDbApi;
-import com.github.paolorotolo.expandableheightlistview.ExpandableHeightListView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;

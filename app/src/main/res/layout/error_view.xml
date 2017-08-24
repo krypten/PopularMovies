@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/error_view"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_centerHorizontal="true"
+              android:layout_centerVertical="true"
+              android:orientation="vertical"
+              android:visibility="gone">
+
+    <android.support.v7.widget.AppCompatImageView
+        android:layout_width="@dimen/error_image_size"
+        android:layout_height="@dimen/error_image_size"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="@dimen/error_image_margin_bottom"
+        android:src="@android:drawable/ic_dialog_alert"
+        android:tint="?attr/colorAccent"/>
+
+    <TextView
+        android:id="@+id/error_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/generic_error_message"
+        android:textColor="?attr/colorAccent"
+        android:textSize="@dimen/error_message_text_size"/>
+</LinearLayout>

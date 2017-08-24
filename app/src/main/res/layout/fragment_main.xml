@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_margin="@dimen/zero_dimension"
-    android:padding="@dimen/zero_dimension"
-    tools:context="com.innovation.studio.moviepop.MovieGridFragment">
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/zero_dimension"
+                android:background="?attr/colorPrimaryDark"
+                android:padding="@dimen/zero_dimension"
+                tools:context="com.innovation.studio.moviepop.MovieGridFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/gridview_movie"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="@dimen/zero_dimension"
+        android:background="?attr/colorPrimaryDark"
         android:numColumns="2"
-        android:stretchMode="columnWidth"
         android:padding="@dimen/zero_dimension"
-        android:background="?attr/colorPrimaryDark"/>
+        android:stretchMode="columnWidth"/>
+
+    <include layout="@layout/error_view"/>
 </RelativeLayout>

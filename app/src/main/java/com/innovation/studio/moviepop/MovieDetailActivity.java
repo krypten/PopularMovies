@@ -3,8 +3,6 @@ package com.innovation.studio.moviepop;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.innovation.studio.moviepop.R;
-
 /**
  * Movie Detail Activity for showing the details for Movie.
  */

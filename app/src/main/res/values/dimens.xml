@@ -25,4 +25,7 @@
     <!-- Line -->
     <dimen name="line_width">1dp</dimen>
     <dimen name="line_margin">5dp</dimen>
+    <dimen name="error_message_text_size">15sp</dimen>
+    <dimen name="error_image_size">100dp</dimen>
+    <dimen name="error_image_margin_bottom">50dp</dimen>
 </resources>

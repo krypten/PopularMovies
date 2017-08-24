@@ -20,8 +20,10 @@ import java.util.List;
 public class MovieService extends IntentService {
 	private static final String TAG = MovieService.class.getSimpleName();
 
-	public static final String BROADCAST_ACTION_STATE_CHANGE
-		= "com.innovation.studio.moviepop.intent.action.STATE_CHANGE";
+	private static final String BASE_ACTION = "com.innovation.studio.moviepop.intent.action.";
+	public static final String BROADCAST_ACTION_ERROR = BASE_ACTION + "ERROR";
+	public static final String BROADCAST_ACTION_NO_INTERNET = BASE_ACTION + "NO_INTERNET";
+	public static final String BROADCAST_ACTION_STATE_CHANGE = BASE_ACTION + "STATE_CHANGE";
 
 	public MovieService() {
 		super(TAG);
@@ -34,6 +36,7 @@ public class MovieService extends IntentService {
 		if (conMgr.getActiveNetworkInfo() == null
 			|| !conMgr.getActiveNetworkInfo().isAvailable()
 			|| !conMgr.getActiveNetworkInfo().isConnected()) {
+			sendBroadcast(new Intent(BROADCAST_ACTION_NO_INTERNET));
 			return;
 		}
 		final String path = PrefUtils.getPath(getApplicationContext());
@@ -47,31 +50,35 @@ public class MovieService extends IntentService {
 		final ArrayList<ContentProviderOperation> cpo = new ArrayList<>();
 		final Uri dirUri = MoviesContract.MovieEntry.buildDirUri();
 
-		// cpo.add(ContentProviderOperation.newDelete(dirUri).build());
 		cpo.add(ContentProviderOperation.newDelete(pathUri).build());
 
 		try {
 			List<Movie> movieList = new APIServiceCall().call(path);
 
-			for (final Movie movie : movieList) {
-				final ContentValues values = new ContentValues();
-				values.put(MoviesContract.MovieEntry._ID, movie.getId());
-				values.put(MoviesContract.MovieEntry.TITLE, movie.getTitle());
-				values.put(MoviesContract.MovieEntry.OVERVIEW, movie.getOverview());
-				values.put(MoviesContract.MovieEntry.RELEASE_DATE, movie.getReleaseYear());
-				values.put(MoviesContract.MovieEntry.POSTER_URL, movie.getPosterlUrl());
-				values.put(MoviesContract.MovieEntry.RATING, movie.getRating());
-				cpo.add(ContentProviderOperation.newInsert(dirUri).withValues(values).build());
+			if (movieList != null) {
 
-				final ContentValues pathValue = new ContentValues();
-				pathValue.put(MoviesContract.COLUMN_MOVIE_ID_KEY, movie.getId());
-				cpo.add(ContentProviderOperation.newInsert(pathUri).withValues(pathValue).build());
+				for (final Movie movie : movieList) {
+					final ContentValues values = new ContentValues();
+					values.put(MoviesContract.MovieEntry._ID, movie.getId());
+					values.put(MoviesContract.MovieEntry.TITLE, movie.getTitle());
+					values.put(MoviesContract.MovieEntry.OVERVIEW, movie.getOverview());
+					values.put(MoviesContract.MovieEntry.RELEASE_DATE, movie.getReleaseYear());
+					values.put(MoviesContract.MovieEntry.POSTER_URL, movie.getPosterlUrl());
+					values.put(MoviesContract.MovieEntry.RATING, movie.getRating());
+					cpo.add(ContentProviderOperation.newInsert(dirUri).withValues(values).build());
+
+					final ContentValues pathValue = new ContentValues();
+					pathValue.put(MoviesContract.COLUMN_MOVIE_ID_KEY, movie.getId());
+					cpo.add(ContentProviderOperation.newInsert(pathUri).withValues(pathValue).build());
+				}
+				getContentResolver().applyBatch(MoviesContract.CONTENT_AUTHORITY, cpo);
+				sendBroadcast(new Intent(BROADCAST_ACTION_STATE_CHANGE));
+			} else {
+				sendBroadcast(new Intent(BROADCAST_ACTION_ERROR));
 			}
-			getContentResolver().applyBatch(MoviesContract.CONTENT_AUTHORITY, cpo);
 		} catch (RemoteException | OperationApplicationException e) {
 			e.printStackTrace();
 			Log.e(TAG, "Error updating content.", e);
 		}
-		// sendStickyBroadcast(new Intent(BROADCAST_ACTION_STATE_CHANGE));
 	}
 }

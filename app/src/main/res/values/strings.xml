@@ -8,4 +8,7 @@
     <!-- Movie Detail Activity -->
     <string name="trailer_label">Trailers</string>
     <string name="review_label">Reviews</string>
+    <!-- Error messages -->
+    <string name="generic_error_message">Something went wrong. Please try again</string>
+    <string name="connectivity_error_message">Unable to load. Check your internet connection</string>
 </resources>
